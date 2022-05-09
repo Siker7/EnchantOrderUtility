@@ -4,7 +4,7 @@ import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 
 plugins {
     kotlin("jvm") version "1.6.10"
-    id("org.jetbrains.compose")
+    id("org.jetbrains.compose") version "1.1.1"
 }
 
 group = "com.sikerspot.enchantOrderUtility"
@@ -19,6 +19,7 @@ repositories {
 dependencies {
     testImplementation(kotlin("test"))
     implementation(compose.desktop.currentOs)
+    //Figure out repository | implementation("com.arkivanov.decompose:decompose:<0.6.0>")
 }
 
 tasks.test {
