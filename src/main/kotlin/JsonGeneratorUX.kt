@@ -47,7 +47,7 @@ fun topSection(){
 fun centerSection(){
 
     //this is here because it works best for state-hauling
-    var jsonEnchantList = mutableStateListOf<RawEnchant>()
+    val jsonEnchantList = mutableStateListOf<RawEnchant>()
 
     Row(
         modifier = Modifier.fillMaxSize(),
@@ -56,7 +56,7 @@ fun centerSection(){
     ) {
         inputFields()
         Spacer(modifier = Modifier.width(40.dp))
-        controlButtons({jsonEnchantList.add(RawEnchant(enchantNameFieldValue, enchantMaxLevelFieldValue, enchantCostFieldValue)); println(jsonEnchantList)}, {println("editButton pressed")})
+        controlButtons({jsonEnchantList.add(RawEnchant(enchantNameFieldValue, enchantMaxLevelFieldValue, enchantCostFieldValue))}, {println("editButton pressed")})
         Spacer(modifier = Modifier.width(40.dp))
         enchantListDisplay(jsonEnchantList)
     }
@@ -109,7 +109,6 @@ fun enchantMaxLevel(){
         label = {Text("Max Level")}
     )
     enchantMaxLevelFieldValue = fieldValue.value.text.toIntOrNull()
-    println(enchantMaxLevelFieldValue)
 
 }
 
@@ -153,7 +152,6 @@ fun enchantListDisplay(inputList: List<RawEnchant>){
                 .border(width = 2.dp, color = Color.DarkGray), backgroundColor = Color.LightGray
         ) {
             rawEnchantList(inputList)
-            println("The card for the lazy column was run")
         }
     }
 }
@@ -161,11 +159,9 @@ fun enchantListDisplay(inputList: List<RawEnchant>){
 // LazyColumn meant to display the list of enchantments that have been submitted to the list so far.
 @Composable
 fun rawEnchantList(inputList: List<RawEnchant>){
-    println("lazyColumn run")
-    val internalArray = inputList.toTypedArray() //note: I'm not even sure I need to do this, will revisit later
     LazyColumn(modifier = Modifier) {
-        items(items = internalArray) { internalArray ->
-            rawEnchantCard(internalArray.rawEnchantName, internalArray.rawEnchantMaxLevel, internalArray.rawEnchantCost)
+        items(items = inputList) { inputList ->
+            rawEnchantCard(inputList.rawEnchantName, inputList.rawEnchantMaxLevel, inputList.rawEnchantCost)
         }
     }
 }
