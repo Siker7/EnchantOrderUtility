@@ -93,7 +93,7 @@ fun enchantInputField(label: String, value: String, valueChanged: (String) -> Un
 fun controlButtons(state: JsonGeneratorState, editButton: () -> Unit){
     Column(Modifier.width(40.dp).height(400.dp)) {
         Spacer(modifier = Modifier.height(195.dp))
-        //Converts the data from the input fields into a RawEnchant object and adds that object to jsonEnchantList
+        //Converts the data from the input fields into an enchant object and adds that object to jsonEnchantList
         Button(onClick = {addEnchantToList(state)}, modifier = Modifier.align(Alignment.CenterHorizontally)) {
             Text(">")
         }
@@ -121,7 +121,7 @@ fun enchantList(state: JsonGeneratorState){
         ) {
             LazyColumn(modifier = Modifier) {
                 items(items = state.jsonEnchantList) { list ->
-                    rawEnchantCard(list.rawEnchantName, list.rawEnchantMaxLevel, list.rawEnchantCost)
+                    enchantCard(list.enchantName, list.enchantMaxLevel, list.enchantCost)
                 }
             }
         }
@@ -131,7 +131,7 @@ fun enchantList(state: JsonGeneratorState){
 // Card template meant to display a single item in the list of enchantments.
 // This will be called multiple times, once for each enchantment in the list.
 @Composable
-fun rawEnchantCard(name: String, maxLevel: Int?, cost: Int?){
+fun enchantCard(name: String, maxLevel: Int?, cost: Int?){
     Card(
         modifier = Modifier
             .padding(10.dp)

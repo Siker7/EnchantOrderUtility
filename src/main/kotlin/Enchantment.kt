@@ -1,4 +1,4 @@
 package com.sikerspot.enchantOrderUtility
 
 //data class defining an Enchantment by the most relevant metrics to xp cost in-game
-data class RawEnchant(val rawEnchantName:String, val rawEnchantMaxLevel:Int?, val rawEnchantCost:Int?)
+data class Enchant(val enchantName:String, val enchantMaxLevel:Int?, val enchantCost:Int?)
