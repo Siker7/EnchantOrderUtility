@@ -9,19 +9,11 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
-
-
-// couldn't figure out how to put these properly in a composable, or if I should even do that.
-// For now, the input field values take their value from here, and when the input field value changes, these values change.
-var enchantNameFieldValue: String = " "
-var enchantCostFieldValue: Int? = 0
-var enchantMaxLevelFieldValue: Int? = 0
 
 // The part of the UI containing the first page of the list creation feature.
 // Eventually, this will be used to generate JSON files with lists of Enchant objects for the main part of the program to use.
@@ -49,7 +41,7 @@ fun topSection(){
 // This includes the input fields, buttons for adding/removing/editing enchants in the list, and the list.
 @Preview
 @Composable
-fun centerSection(){
+fun centerSection(state: EditableUserInputState = rememberEditableUserInputState("", "", "")){
 
     //this is here because it works best for state-hauling (I think)
     val jsonEnchantList = mutableStateListOf<RawEnchant>()
@@ -59,9 +51,9 @@ fun centerSection(){
         verticalAlignment = Alignment.Top,
         horizontalArrangement = Arrangement.Center
     ) {
-        inputFields()
+        inputFields(state)
         Spacer(modifier = Modifier.width(40.dp))
-        controlButtons({jsonEnchantList.add(RawEnchant(enchantNameFieldValue, enchantMaxLevelFieldValue, enchantCostFieldValue))}, {println("editButton pressed")})
+        controlButtons({jsonEnchantList.add(RawEnchant(state.nameFieldValue, state.maxLevelFieldValue.toIntOrNull(), state.costFieldValue.toIntOrNull()))}, {println("editButton pressed")})
         Spacer(modifier = Modifier.width(40.dp))
         enchantListDisplay(jsonEnchantList)
     }
@@ -69,7 +61,7 @@ fun centerSection(){
 
 //This is where the input fields live.
 @Composable
-fun inputFields(){
+fun inputFields(state: EditableUserInputState){
     Column(verticalArrangement = Arrangement.spacedBy(5.dp), modifier = Modifier) {
         Text(
             text = "Create Enchantment",
@@ -83,9 +75,9 @@ fun inputFields(){
                 .border(width = 2.dp, color = Color.DarkGray), backgroundColor = Color.LightGray
         ) {
             Column(Modifier, verticalArrangement = Arrangement.Center) {
-                enchantName()
-                enchantMaxLevel()
-                enchantCost()
+                enchantName(state.nameFieldValue) {state.nameFieldValue = it}
+                enchantMaxLevel(state.maxLevelFieldValue) {state.maxLevelFieldValue = it}
+                enchantCost(state.costFieldValue) {state.costFieldValue = it}
             }
         }
     }
@@ -93,42 +85,39 @@ fun inputFields(){
 
 //The input field for Enchantment Name
 @Composable
-fun enchantName(){
-    val fieldValue = remember { mutableStateOf(TextFieldValue()) }
+fun enchantName(nameValue: String, nameChanged: (String) -> Unit){
+    //val fieldValue = remember { mutableStateOf(TextFieldValue()) }
     TextField(
         singleLine = true,
-        value = fieldValue.value,
-        onValueChange = {fieldValue.value = it},
-        label = {Text("Name") }
+        value = nameValue,
+        onValueChange = nameChanged,
+        label = {Text("Name")}
     )
-    enchantNameFieldValue = fieldValue.value.text
 }
 
 //The input field for Maximum Enchantment Power Level
 @Composable
-fun enchantMaxLevel(){
-    val fieldValue = remember { mutableStateOf(TextFieldValue()) }
+fun enchantMaxLevel(maxLevelValue: String, maxLevelChanged: (String) -> Unit){
+    //val fieldValue = remember { mutableStateOf(TextFieldValue()) }
     TextField(
         singleLine = true,
-        value = fieldValue.value,
-        onValueChange = {fieldValue.value = it},
+        value = maxLevelValue,
+        onValueChange = maxLevelChanged,
         label = {Text("Max Level")}
     )
-    enchantMaxLevelFieldValue = fieldValue.value.text.toIntOrNull()
 
 }
 
 //The input field for Enchantment XP Cost
 @Composable
-fun enchantCost(){
-    val fieldValue = remember { mutableStateOf(TextFieldValue()) }
+fun enchantCost(costValue: String, costChanged: (String) -> Unit){
+    //val fieldValue = remember { mutableStateOf(TextFieldValue()) }
     TextField(
         singleLine = true,
-        value = fieldValue.value,
-        onValueChange = {fieldValue.value = it},
+        value = costValue,
+        onValueChange = costChanged,
         label = {Text("Cost Multiplier")}
     )
-    enchantCostFieldValue = fieldValue.value.text.toIntOrNull()
 }
 
 //The buttons in the center column.
