@@ -1,5 +1,4 @@
 package com.sikerspot.enchantOrderUtility
-import androidx.compose.desktop.ui.tooling.preview.Preview
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -39,13 +38,8 @@ fun topSection(){
 
 // The part of the UI containing everything in the center row of the application.
 // This includes the input fields, buttons for adding/removing/editing enchants in the list, and the list.
-@Preview
 @Composable
-fun centerSection(state: EditableUserInputState = rememberEditableUserInputState("", "", "")){
-
-    //this is here because it works best for state-hauling (I think)
-    val jsonEnchantList = mutableStateListOf<RawEnchant>()
-
+fun centerSection(state: JsonGeneratorState = rememberJsonGeneratorState("", "", "")){
     Row(
         modifier = Modifier.fillMaxSize(),
         verticalAlignment = Alignment.Top,
@@ -53,15 +47,15 @@ fun centerSection(state: EditableUserInputState = rememberEditableUserInputState
     ) {
         inputFields(state)
         Spacer(modifier = Modifier.width(40.dp))
-        controlButtons({jsonEnchantList.add(RawEnchant(state.nameFieldValue, state.maxLevelFieldValue.toIntOrNull(), state.costFieldValue.toIntOrNull()))}, {println("editButton pressed")})
+        controlButtons({state.jsonEnchantList.add(RawEnchant(state.nameFieldValue, state.maxLevelFieldValue.toIntOrNull(), state.costFieldValue.toIntOrNull()));println("addButton pressed")}, {println("editButton pressed")})
         Spacer(modifier = Modifier.width(40.dp))
-        enchantListDisplay(jsonEnchantList)
+        enchantListDisplay(state)
     }
 }
 
 //This is where the input fields live.
 @Composable
-fun inputFields(state: EditableUserInputState){
+fun inputFields(state: JsonGeneratorState){
     Column(verticalArrangement = Arrangement.spacedBy(5.dp), modifier = Modifier) {
         Text(
             text = "Create Enchantment",
@@ -86,7 +80,6 @@ fun inputFields(state: EditableUserInputState){
 //The input field for Enchantment Name
 @Composable
 fun enchantName(nameValue: String, nameChanged: (String) -> Unit){
-    //val fieldValue = remember { mutableStateOf(TextFieldValue()) }
     TextField(
         singleLine = true,
         value = nameValue,
@@ -98,7 +91,6 @@ fun enchantName(nameValue: String, nameChanged: (String) -> Unit){
 //The input field for Maximum Enchantment Power Level
 @Composable
 fun enchantMaxLevel(maxLevelValue: String, maxLevelChanged: (String) -> Unit){
-    //val fieldValue = remember { mutableStateOf(TextFieldValue()) }
     TextField(
         singleLine = true,
         value = maxLevelValue,
@@ -111,7 +103,6 @@ fun enchantMaxLevel(maxLevelValue: String, maxLevelChanged: (String) -> Unit){
 //The input field for Enchantment XP Cost
 @Composable
 fun enchantCost(costValue: String, costChanged: (String) -> Unit){
-    //val fieldValue = remember { mutableStateOf(TextFieldValue()) }
     TextField(
         singleLine = true,
         value = costValue,
@@ -138,7 +129,7 @@ fun controlButtons(addButton: () -> Unit, editButton: () -> Unit){
 
 //the column on the right containing the enchantment list
 @Composable
-fun enchantListDisplay(inputList: List<RawEnchant>){
+fun enchantListDisplay(state: JsonGeneratorState){
     Column(verticalArrangement = Arrangement.spacedBy(5.dp), modifier = Modifier) {
         Text(
             text = "Enchantment List",
@@ -151,7 +142,7 @@ fun enchantListDisplay(inputList: List<RawEnchant>){
             modifier = Modifier.width(280.dp).height(400.dp)
                 .border(width = 2.dp, color = Color.DarkGray), backgroundColor = Color.LightGray
         ) {
-            rawEnchantList(inputList)
+            rawEnchantList(state.jsonEnchantList)
         }
     }
 }
