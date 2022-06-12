@@ -70,45 +70,21 @@ fun inputFields(state: JsonGeneratorState){
                 .border(width = 2.dp, color = Color.DarkGray), backgroundColor = Color.LightGray
         ) {
             Column(Modifier, verticalArrangement = Arrangement.Center) {
-                enchantName(state.nameFieldValue) {state.nameFieldValue = it}
-                enchantMaxLevel(state.maxLevelFieldValue) {state.maxLevelFieldValue = it}
-                enchantCost(state.costFieldValue) {state.costFieldValue = it}
+                enchantInputField("Name", state.nameFieldValue) {state.nameFieldValue = it}
+                enchantInputField("Max Level", state.maxLevelFieldValue) {state.maxLevelFieldValue = it}
+                enchantInputField("Cost Multiplier", state.costFieldValue) {state.costFieldValue = it}
             }
         }
     }
 }
 
-//The input field for Enchantment Name
 @Composable
-fun enchantName(nameValue: String, nameChanged: (String) -> Unit){
+fun enchantInputField(label: String, value: String, valueChanged: (String) -> Unit){
     TextField(
         singleLine = true,
-        value = nameValue,
-        onValueChange = nameChanged,
-        label = {Text("Name")}
-    )
-}
-
-//The input field for Maximum Enchantment Power Level
-@Composable
-fun enchantMaxLevel(maxLevelValue: String, maxLevelChanged: (String) -> Unit){
-    TextField(
-        singleLine = true,
-        value = maxLevelValue,
-        onValueChange = maxLevelChanged,
-        label = {Text("Max Level")}
-    )
-
-}
-
-//The input field for Enchantment XP Cost
-@Composable
-fun enchantCost(costValue: String, costChanged: (String) -> Unit){
-    TextField(
-        singleLine = true,
-        value = costValue,
-        onValueChange = costChanged,
-        label = {Text("Cost Multiplier")}
+        value = value,
+        onValueChange = valueChanged,
+        label = {Text(label)}
     )
 }
 
