@@ -50,7 +50,7 @@ fun centerSection(state: JsonGeneratorState = rememberJsonGeneratorState("", "",
         Spacer(modifier = Modifier.width(40.dp))
         controlButtons(state) {println("editButton pressed")}
         Spacer(modifier = Modifier.width(40.dp))
-        enchantListDisplay(state)
+        enchantList(state)
     }
 }
 
@@ -106,7 +106,7 @@ fun controlButtons(state: JsonGeneratorState, editButton: () -> Unit){
 
 //the column on the right containing the enchantment list
 @Composable
-fun enchantListDisplay(state: JsonGeneratorState){
+fun enchantList(state: JsonGeneratorState){
     Column(verticalArrangement = Arrangement.spacedBy(5.dp), modifier = Modifier) {
         Text(
             text = "Enchantment List",
@@ -119,17 +119,11 @@ fun enchantListDisplay(state: JsonGeneratorState){
             modifier = Modifier.width(280.dp).height(400.dp)
                 .border(width = 2.dp, color = Color.DarkGray), backgroundColor = Color.LightGray
         ) {
-            rawEnchantList(state.jsonEnchantList)
-        }
-    }
-}
-
-// LazyColumn meant to display the list of enchantments that have been submitted to the list so far.
-@Composable
-fun rawEnchantList(inputList: List<RawEnchant>){
-    LazyColumn(modifier = Modifier) {
-        items(items = inputList) { inputList ->
-            rawEnchantCard(inputList.rawEnchantName, inputList.rawEnchantMaxLevel, inputList.rawEnchantCost)
+            LazyColumn(modifier = Modifier) {
+                items(items = state.jsonEnchantList) { list ->
+                    rawEnchantCard(list.rawEnchantName, list.rawEnchantMaxLevel, list.rawEnchantCost)
+                }
+            }
         }
     }
 }
