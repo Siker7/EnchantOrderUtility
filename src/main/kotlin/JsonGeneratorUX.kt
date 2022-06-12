@@ -17,11 +17,14 @@ import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
 
 
-//implement state-hauling for these variables after you get a working commit
+// couldn't figure out how to put these properly in a composable, or if I should even do that.
+// For now, the input field values take their value from here, and when the input field value changes, these values change.
 var enchantNameFieldValue: String = " "
 var enchantCostFieldValue: Int? = 0
 var enchantMaxLevelFieldValue: Int? = 0
 
+// The part of the UI containing the first page of the list creation feature.
+// Eventually, this will be used to generate JSON files with lists of Enchant objects for the main part of the program to use.
 fun jsonGeneratorUI() = application{
     Window(onCloseRequest = ::exitApplication, title = "Enchant Order Utility", resizable = false, state = rememberWindowState(width = 800.dp, height = 600.dp)) {
         MaterialTheme {
@@ -37,16 +40,18 @@ fun jsonGeneratorUI() = application{
     }
 }
 
+// Haven't made this yet. Might include things like a sort button for the column of enchants on the right in the future.
 fun topSection(){
-    //Haven't made this yet
+
 }
 
-//The part of the UI containing the enchantment input fields, buttons for adding/removing/editing enchants in the list, and the list.
+// The part of the UI containing everything in the center row of the application.
+// This includes the input fields, buttons for adding/removing/editing enchants in the list, and the list.
 @Preview
 @Composable
 fun centerSection(){
 
-    //this is here because it works best for state-hauling
+    //this is here because it works best for state-hauling (I think)
     val jsonEnchantList = mutableStateListOf<RawEnchant>()
 
     Row(
@@ -62,7 +67,7 @@ fun centerSection(){
     }
 }
 
-//The part of the lists function holding the input fields.
+//This is where the input fields live.
 @Composable
 fun inputFields(){
     Column(verticalArrangement = Arrangement.spacedBy(5.dp), modifier = Modifier) {
@@ -86,6 +91,7 @@ fun inputFields(){
     }
 }
 
+//The input field for Enchantment Name
 @Composable
 fun enchantName(){
     val fieldValue = remember { mutableStateOf(TextFieldValue()) }
@@ -98,7 +104,7 @@ fun enchantName(){
     enchantNameFieldValue = fieldValue.value.text
 }
 
-
+//The input field for Maximum Enchantment Power Level
 @Composable
 fun enchantMaxLevel(){
     val fieldValue = remember { mutableStateOf(TextFieldValue()) }
@@ -112,6 +118,7 @@ fun enchantMaxLevel(){
 
 }
 
+//The input field for Enchantment XP Cost
 @Composable
 fun enchantCost(){
     val fieldValue = remember { mutableStateOf(TextFieldValue()) }
@@ -124,19 +131,23 @@ fun enchantCost(){
     enchantCostFieldValue = fieldValue.value.text.toIntOrNull()
 }
 
+//The buttons in the center column.
 @Composable
 fun controlButtons(addButton: () -> Unit, editButton: () -> Unit){
     Column(Modifier.width(40.dp).height(400.dp)) {
         Spacer(modifier = Modifier.height(195.dp))
+        //Converts the data from the input fields into a RawEnchant object and adds that object to jsonEnchantList
         Button(onClick = addButton, modifier = Modifier.align(Alignment.CenterHorizontally)) {
             Text(">")
         }
+        //(not implemented) will remove the selected object from list and fill the input fields with the data that was in the selected object
         Button(onClick = editButton, modifier = Modifier.align(Alignment.CenterHorizontally)) {
             Text("<")
         }
     }
 }
 
+//the column on the right containing the enchantment list
 @Composable
 fun enchantListDisplay(inputList: List<RawEnchant>){
     Column(verticalArrangement = Arrangement.spacedBy(5.dp), modifier = Modifier) {
@@ -187,6 +198,7 @@ fun rawEnchantCard(name: String, maxLevel: Int?, cost: Int?){
     }
 }
 
+//haven't made this yet, will include buttons to progress to the next step, to save, and to exit list creation.
 fun bottomSection(){
-    //haven't made this yet
+
 }
