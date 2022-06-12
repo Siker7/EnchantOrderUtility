@@ -1,4 +1,5 @@
 package com.sikerspot.enchantOrderUtility
+
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -47,7 +48,7 @@ fun centerSection(state: JsonGeneratorState = rememberJsonGeneratorState("", "",
     ) {
         inputFields(state)
         Spacer(modifier = Modifier.width(40.dp))
-        controlButtons({state.jsonEnchantList.add(RawEnchant(state.nameFieldValue, state.maxLevelFieldValue.toIntOrNull(), state.costFieldValue.toIntOrNull()));println("addButton pressed")}, {println("editButton pressed")})
+        controlButtons(state) {println("editButton pressed")}
         Spacer(modifier = Modifier.width(40.dp))
         enchantListDisplay(state)
     }
@@ -113,11 +114,11 @@ fun enchantCost(costValue: String, costChanged: (String) -> Unit){
 
 //The buttons in the center column.
 @Composable
-fun controlButtons(addButton: () -> Unit, editButton: () -> Unit){
+fun controlButtons(state: JsonGeneratorState, editButton: () -> Unit){
     Column(Modifier.width(40.dp).height(400.dp)) {
         Spacer(modifier = Modifier.height(195.dp))
         //Converts the data from the input fields into a RawEnchant object and adds that object to jsonEnchantList
-        Button(onClick = addButton, modifier = Modifier.align(Alignment.CenterHorizontally)) {
+        Button(onClick = {addEnchantToList(state)}, modifier = Modifier.align(Alignment.CenterHorizontally)) {
             Text(">")
         }
         //(not implemented) will remove the selected object from list and fill the input fields with the data that was in the selected object
