@@ -1,9 +1,11 @@
 package com.sikerspot.enchantOrderUtility
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.selection.selectable
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -48,7 +50,7 @@ fun centerSection(state: JsonGeneratorState = rememberJsonGeneratorState("", "",
     ) {
         inputFields(state)
         Spacer(modifier = Modifier.width(40.dp))
-        controlButtons(state) {println("editButton pressed")}
+        controlButtons(state)
         Spacer(modifier = Modifier.width(40.dp))
         enchantList(state)
     }
@@ -90,15 +92,15 @@ fun enchantInputField(label: String, value: String, valueChanged: (String) -> Un
 
 //The buttons in the center column.
 @Composable
-fun controlButtons(state: JsonGeneratorState, editButton: () -> Unit){
+fun controlButtons(state: JsonGeneratorState){
     Column(Modifier.width(40.dp).height(400.dp)) {
         Spacer(modifier = Modifier.height(195.dp))
-        //Converts the data from the input fields into an enchant object and adds that object to jsonEnchantList
+        //Converts the data from the input fields into an "enchant" object and adds that object to jsonEnchantList
         Button(onClick = {addEnchantToList(state)}, modifier = Modifier.align(Alignment.CenterHorizontally)) {
             Text(">")
         }
         //(not implemented) will remove the selected object from list and fill the input fields with the data that was in the selected object
-        Button(onClick = editButton, modifier = Modifier.align(Alignment.CenterHorizontally)) {
+        Button(onClick = {editEnchant(state)}, modifier = Modifier.align(Alignment.CenterHorizontally)) {
             Text("<")
         }
     }
@@ -121,7 +123,7 @@ fun enchantList(state: JsonGeneratorState){
         ) {
             LazyColumn(modifier = Modifier) {
                 items(items = state.jsonEnchantList) { list ->
-                    enchantCard(list.enchantName, list.enchantMaxLevel, list.enchantCost)
+                    enchantCard(state, list.enchantName, list.enchantMaxLevel, list.enchantCost)
                 }
             }
         }
@@ -131,12 +133,23 @@ fun enchantList(state: JsonGeneratorState){
 // Card template meant to display a single item in the list of enchantments.
 // This will be called multiple times, once for each enchantment in the list.
 @Composable
-fun enchantCard(name: String, maxLevel: Int?, cost: Int?){
+fun enchantCard(state:JsonGeneratorState, name: String, maxLevel: Int?, cost: Int?){
     Card(
         modifier = Modifier
             .padding(10.dp)
             .fillMaxWidth()
-            .wrapContentHeight(),
+            .background(
+                if (name == state.selectedEnchant)
+                    Color.Red else Color.Yellow
+            )
+            .wrapContentHeight()
+            .selectable
+                (
+                selected = name == state.selectedEnchant,
+                onClick = { if (state.selectedEnchant != name)
+                    state.selectedEnchant = name else state.selectedEnchant = ""
+                }
+            ),
         shape = MaterialTheme.shapes.medium,
         elevation = 5.dp,
         backgroundColor = MaterialTheme.colors.surface
