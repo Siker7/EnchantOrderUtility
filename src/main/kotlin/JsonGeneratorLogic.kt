@@ -17,18 +17,41 @@ fun rememberJsonGeneratorState(name: String, maxLevel: String, cost: String): Js
     }
 
 fun addEnchantToList(state: JsonGeneratorState) {
-    state.jsonEnchantList.add(Enchant(state.nameFieldValue, state.maxLevelFieldValue.toIntOrNull(), state.costFieldValue.toIntOrNull()))
-    state.selectedEnchant = state.nameFieldValue
-    state.nameFieldValue = ""
-    state.maxLevelFieldValue = ""
-    state.costFieldValue = ""
+    if (state.nameFieldValue.isAlphabetical() && state.maxLevelFieldValue.isNumerical() && state.costFieldValue.isNumerical()) {
+        state.jsonEnchantList.add(
+            Enchant(
+                state.nameFieldValue,
+                state.maxLevelFieldValue.toIntOrNull(),
+                state.costFieldValue.toIntOrNull()
+            )
+        )
+        state.selectedEnchant = state.nameFieldValue
+        state.nameFieldValue = ""
+        state.maxLevelFieldValue = ""
+        state.costFieldValue = ""
+    }
+}
+
+fun deleteEnchant(state: JsonGeneratorState) {
+    if (state.selectedEnchant != "") {
+        val enchantToDelete: Enchant? = state.jsonEnchantList.find { it.enchantName == state.selectedEnchant }
+        state.jsonEnchantList.remove(enchantToDelete)
+        state.selectedEnchant = ""
+    }
 }
 
 fun editEnchant(state: JsonGeneratorState) {
-    val enchantToDelete: Enchant? = state.jsonEnchantList.find {it.enchantName == state.selectedEnchant}
-    state.nameFieldValue = enchantToDelete?.enchantName.toString()
-    state.maxLevelFieldValue = enchantToDelete?.enchantMaxLevel.toString()
-    state.costFieldValue = enchantToDelete?.enchantCost.toString()
-    state.jsonEnchantList.remove(enchantToDelete)
-    state.selectedEnchant = ""
+    if (state.selectedEnchant != "") {
+        val enchantToEdit: Enchant? = state.jsonEnchantList.find { it.enchantName == state.selectedEnchant }
+        state.nameFieldValue = enchantToEdit?.enchantName.toString().trimEnd()
+        state.maxLevelFieldValue = enchantToEdit?.enchantMaxLevel.toString()
+        state.costFieldValue = enchantToEdit?.enchantCost.toString()
+        state.jsonEnchantList.remove(enchantToEdit)
+        state.selectedEnchant = ""
+    }
 }
+
+
+//these may not be necessary, as the textFields filter this stuff out on their own
+fun String?.isNumerical() = !this.isNullOrEmpty() && this.all {Character.isDigit(it)}
+fun String?.isAlphabetical() = !this.isNullOrEmpty() && this.all {Character.isLetter(it) || Character.isWhitespace(it)}
