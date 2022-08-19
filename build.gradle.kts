@@ -12,13 +12,26 @@ version = "1.0.0"
 
 repositories {
     mavenCentral()
-    maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
     google()
+    maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
+
+
 }
 
 dependencies {
+    //val navVersion = "2.5.1"
     testImplementation(kotlin("test"))
     implementation(compose.desktop.currentOs)
+    /*
+    I know for a fact these were needed at one point.
+    Now, the program works fine without them, and doesn't even start with them active.
+    I'm keeping these here for now in case that changes.
+
+    //implementation("androidx.navigation:navigation-fragment-ktx:$navVersion")
+    //implementation("androidx.navigation:navigation-ui:$navVersion")
+    //implementation("androidx.navigation:navigation-compose:$navVersion")
+    */
+
     //Figure out repository | implementation("com.arkivanov.decompose:decompose:<0.6.0>")
 }
 
