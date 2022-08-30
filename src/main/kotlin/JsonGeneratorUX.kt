@@ -5,7 +5,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.selection.selectable
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.material.*
 import androidx.compose.runtime.*
@@ -17,81 +17,55 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.key.*
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.Window
-import androidx.compose.ui.window.application
-import androidx.compose.ui.window.rememberWindowState
+import androidx.compose.ui.unit.sp
 import java.awt.event.KeyEvent
 
 // The part of the UI containing the first page of the list creation feature.
 // Eventually, this will be used to generate JSON files with lists of Enchant objects for the main part of the program to use.
-fun jsonGeneratorUI() = application{
-    Window(onCloseRequest = ::exitApplication, title = "Enchant Order Utility", resizable = false, state = rememberWindowState(width = 800.dp, height = 600.dp)) {
-        MaterialTheme {
-            Column(modifier = Modifier.fillMaxSize(), Arrangement.spacedBy(0.dp)) {
-                topSection()
-                Spacer(modifier = Modifier.height(40.dp))
-                centerSection()
-                Spacer(modifier = Modifier.height(5.dp))
-                bottomSection()
+@Composable
+fun jsonGeneratorUI(state: JsonGeneratorState = rememberJsonGeneratorState("", "", "")){
+    //Column containing the entirety of this UI
+    Column(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
+        //Navigation tabs for the Json Generator UI
+        Row(modifier = Modifier.fillMaxWidth(663.toFloat()/810).fillMaxHeight(45.toFloat()/500), horizontalArrangement = Arrangement.Center){
+            //Navigates to the Enchantment Creation screen
+            Button(modifier = Modifier.fillMaxWidth(1.toFloat()/3f).weight(1f).fillMaxHeight(), onClick = {}){
+                Text("Enchantments")
+            }
+            //Navigates to the Tool Creation screen
+            Button(modifier = Modifier.fillMaxWidth(1.toFloat()/3f).weight(1f).fillMaxHeight(), onClick = {}){
+                Text("Tools")
+            }
+            //Navigates to the Conflict Creation screen
+            Button(modifier = Modifier.fillMaxWidth(1.toFloat()/3f).weight(1f).fillMaxHeight(), onClick = {}){
+                Text("Conflicts")
             }
         }
-
-    }
-}
-
-// Haven't made this yet. Might include things like tabs for each step of the process.
-fun topSection(){
-
-}
-
-// The part of the UI containing everything in the center row of the application.
-// This includes the input fields, buttons for adding/removing/editing enchants in the list, and the list.
-@Composable
-fun centerSection(state: JsonGeneratorState = rememberJsonGeneratorState("", "", "")){
-    Row(
-        modifier = Modifier.fillMaxSize(),
-        verticalAlignment = Alignment.Top,
-        horizontalArrangement = Arrangement.Center
-    ) {
-        inputFields(state)
-        Spacer(modifier = Modifier.width(40.dp))
-        controlButtons(state)
-        Spacer(modifier = Modifier.width(40.dp))
-        enchantList(state)
-    }
-}
-
-//This is where the input fields live.
-@Composable
-fun inputFields(state: JsonGeneratorState){
-    Column(verticalArrangement = Arrangement.spacedBy(5.dp), modifier = Modifier) {
-        Text(
-            text = "Create Enchantment",
-            Modifier.width(280.dp).height(30.dp).border(width = 2.dp, color = Color.DarkGray)
-                .padding(6.dp),
-            textAlign = TextAlign.Center
-        )
-        Spacer(modifier = Modifier.height(5.dp))
-        Card(
-            modifier = Modifier.width(280.dp).height(400.dp)
-                .border(width = 2.dp, color = Color.DarkGray), backgroundColor = Color.LightGray
-        ) {
-            Column(Modifier, verticalArrangement = Arrangement.Center) {
+        Spacer(Modifier.fillMaxHeight(28.toFloat()/500))
+        //Row containing the Enchantment Creation screen
+        Row(modifier = Modifier.fillMaxWidth(663.toFloat()/810).fillMaxHeight().weight(1f)){
+            //Column containing the input fields
+            Column(modifier = Modifier.fillMaxHeight().fillMaxWidth(309.toFloat()/810).weight(1f).padding(bottom = 7.5.dp), verticalArrangement = Arrangement.SpaceBetween){
                 val focusManager = LocalFocusManager.current
                 val firstField = remember { FocusRequester() }
-                TextField(
+                //Name text field
+                OutlinedTextField(
                     singleLine = true,
                     value = state.nameFieldValue,
                     onValueChange = { value ->
                         state.nameFieldValue = value.filter {it.isLetter() || it.isWhitespace()}
                     },
-                    label = {Text("Name")},
+                    textStyle = TextStyle(fontSize = 20.sp),
+                    label = { Text("Name") },
                     modifier = Modifier
+                        .fillMaxWidth()
+                        .aspectRatio(309.toFloat()/73)
                         .focusRequester(firstField)
                         .onKeyEvent {
-                            if (it.key == Key(KeyEvent.VK_ENTER) && it.type == KeyEventType.KeyDown && state.nameFieldValue.isNotEmpty()) {
+                            if (it.key == Key(KeyEvent.VK_ENTER) && it.type == KeyEventType.KeyDown) {
                                 focusManager.moveFocus(FocusDirection.Next)
                                 true
                             } else {
@@ -99,16 +73,20 @@ fun inputFields(state: JsonGeneratorState){
                             }
                         }
                 )
-                TextField(
+                //Max Level text field
+                OutlinedTextField(
                     singleLine = true,
                     value = state.maxLevelFieldValue,
                     onValueChange = { value ->
                         state.maxLevelFieldValue = value.filter {it.isDigit()}.trimStart('0')
                     },
-                    label = {Text("Max Level")},
+                    textStyle = TextStyle(fontSize = 20.sp),
+                    label = { Text("Max Level") },
                     modifier = Modifier
+                        .fillMaxWidth()
+                        .aspectRatio(309.toFloat()/73)
                         .onKeyEvent {
-                            if (it.key == Key(KeyEvent.VK_ENTER) && it.type == KeyEventType.KeyDown && state.maxLevelFieldValue.isNotEmpty()) {
+                            if (it.key == Key(KeyEvent.VK_ENTER) && it.type == KeyEventType.KeyDown) {
                                 focusManager.moveFocus(FocusDirection.Next)
                                 true
                             } else {
@@ -116,19 +94,23 @@ fun inputFields(state: JsonGeneratorState){
                             }
                         }
                 )
-                TextField(
+                //Cost text field
+                OutlinedTextField(
                     singleLine = true,
                     value = state.costFieldValue,
                     onValueChange = { value ->
                         state.costFieldValue = value.filter {it.isDigit()}.trimStart('0')
                     },
-                    label = {Text("Cost Multiplier")},
                     keyboardActions = KeyboardActions(
                         onDone = {}
                     ),
+                    textStyle = TextStyle(fontSize = 20.sp),
+                    label = { Text("Cost") },
                     modifier = Modifier
+                        .fillMaxWidth()
+                        .aspectRatio(309.toFloat()/73)
                         .onKeyEvent {
-                            if (it.key == Key(KeyEvent.VK_ENTER) && it.type == KeyEventType.KeyDown && state.costFieldValue.isNotEmpty()) {
+                            if (it.key == Key(KeyEvent.VK_ENTER) && it.type == KeyEventType.KeyDown) {
                                 addEnchantToList(state)
                                 firstField.requestFocus()
                                 true
@@ -137,49 +119,32 @@ fun inputFields(state: JsonGeneratorState){
                             }
                         }
                 )
+                //Row containing the Clear and Add buttons
+                Row(modifier = Modifier.fillMaxWidth().aspectRatio(309.toFloat()/45).width(IntrinsicSize.Min), horizontalArrangement = Arrangement.SpaceEvenly){
+                    //Clear button
+                    Button(modifier = Modifier.fillMaxHeight().aspectRatio(73.toFloat()/45), onClick = {clearInputFields(state);focusManager.clearFocus()}){
+                        Text("X")
+                    }
+                    //Add button
+                    Button(modifier = Modifier.fillMaxHeight().aspectRatio(73.toFloat()/45), onClick = { addEnchantToList(state) }){
+                        Text(">")
+                    }
+                }
             }
-        }
-    }
-}
-
-//The buttons in the center column.
-@Composable
-fun controlButtons(state: JsonGeneratorState){
-    Column(Modifier.width(40.dp).height(400.dp)) {
-        Spacer(modifier = Modifier.height(172.dp))
-        //Converts the data from the input fields into an "enchant" object and adds that object to jsonEnchantList
-        Button(onClick = {addEnchantToList(state)}, modifier = Modifier.align(Alignment.CenterHorizontally)) {
-            Text(">")
-        }
-        Button(onClick = {deleteEnchant(state)}, modifier = Modifier.align(Alignment.CenterHorizontally)) {
-            Text("X")
-        }
-        //(not implemented) will remove the selected object from list and fill the input fields with the data that was in the selected object
-        Button(onClick = {editEnchant(state)}, modifier = Modifier.align(Alignment.CenterHorizontally)) {
-            Text("<")
-        }
-    }
-}
-
-//the column on the right containing the enchantment list
-@Composable
-fun enchantList(state: JsonGeneratorState){
-    Column(verticalArrangement = Arrangement.spacedBy(5.dp), modifier = Modifier) {
-        Text(
-            text = "Enchantment List",
-            Modifier.width(280.dp).height(30.dp).border(width = 2.dp, color = Color.DarkGray)
-                .padding(6.dp),
-            textAlign = TextAlign.Center
-        )
-        Spacer(modifier = Modifier.height(5.dp))
-        Card(
-            modifier = Modifier.width(280.dp).height(400.dp)
-                .border(width = 2.dp, color = Color.DarkGray), backgroundColor = Color.LightGray
-        ) {
-            LazyColumn(modifier = Modifier) {
+            Spacer(Modifier.fillMaxWidth(46.toFloat()/810).weight(46.toFloat()/309))
+            LazyColumn(modifier = Modifier.fillMaxHeight().fillMaxWidth(309.toFloat()/810).weight(1f).padding(vertical = 7.5.dp).border(1.dp, Color.Gray, RoundedCornerShape(5.dp))) {
                 items(items = state.jsonEnchantList) { list ->
                     enchantCard(state, list.enchantName, list.enchantMaxLevel, list.enchantCost)
                 }
+            }
+        }
+        Row(modifier = Modifier.fillMaxWidth(546.toFloat()/810).fillMaxHeight(90.toFloat()/500), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center){
+            Button(onClick = {}, modifier = Modifier.fillMaxWidth(191.toFloat()/810).weight(191.toFloat()/546)){
+                Text("")
+            }
+            Spacer(Modifier.fillMaxWidth(164.toFloat()/546))
+            Button(onClick = {}, modifier = Modifier.fillMaxWidth(191.toFloat()/810).weight(191.toFloat()/546)) {
+                Text("")
             }
         }
     }
@@ -191,33 +156,36 @@ fun enchantList(state: JsonGeneratorState){
 fun enchantCard(state:JsonGeneratorState, name: String, maxLevel: Int?, cost: Int?){
     Card(
         modifier = Modifier
-            .padding(10.dp)
+            .padding(1.dp)
             .fillMaxWidth()
-            .background(
-                if (name == state.selectedEnchant)
-                    Color.Red else Color.Yellow
-            )
-            .wrapContentHeight()
-            .selectable
-                (
-                selected = name == state.selectedEnchant,
-                onClick = { if (state.selectedEnchant != name)
-                    state.selectedEnchant = name
-                }
-            ),
+            .aspectRatio(309.toFloat()/27)
+            .border(2.dp, Color.LightGray, RoundedCornerShape(5.dp))
+            .wrapContentHeight(),
         shape = MaterialTheme.shapes.medium,
         elevation = 5.dp,
         backgroundColor = MaterialTheme.colors.surface
     ) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Text(text = name)
-            Text(text = maxLevel.toString())
-            Text(text = cost.toString())
+        Row(modifier = Modifier.fillMaxSize(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center) {
+            Button(onClick = {editEnchant(name, state)}, modifier = Modifier.fillMaxHeight().aspectRatio(1.toFloat()), contentPadding = PaddingValues(0.dp)){
+                Text("<", fontSize = 20.sp)
+            }
+            Text(text = name,
+                fontSize = 20.sp,
+                textAlign = TextAlign.Start,
+                modifier = Modifier.weight(1.toFloat()).padding(start = 5.dp))
+            Spacer(modifier = Modifier.width(1.dp).fillMaxHeight().background(Color.LightGray))
+            Text(text = maxLevel.toString(),
+                fontSize = 20.sp,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.weight(0.3.toFloat()))
+            Spacer(modifier = Modifier.width(1.dp).fillMaxHeight().background(Color.LightGray))
+            Text(text = cost.toString(),
+                fontSize = 20.sp,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.weight(0.3.toFloat()))
+            Button(onClick = {deleteEnchant(name, state)}, modifier = Modifier.fillMaxHeight().aspectRatio(1.toFloat()), contentPadding = PaddingValues(0.dp)){
+                Text("X", fontSize = 20.sp)
+            }
         }
     }
-}
-
-//haven't made this yet, will include buttons to progress to the next step, to save, and to exit list creation.
-fun bottomSection(){
-
 }

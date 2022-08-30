@@ -12,9 +12,8 @@ version = "1.0.0"
 
 repositories {
     mavenCentral()
-    google()
     maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
-
+    google()
 
 }
 
@@ -50,6 +49,7 @@ compose.desktop {
 
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
+
         }
     }
 }

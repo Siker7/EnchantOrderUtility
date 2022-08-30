@@ -7,7 +7,6 @@ class JsonGeneratorState(name: String, maxLevel: String, cost: String) {
     var nameFieldValue by mutableStateOf(name)
     var maxLevelFieldValue by mutableStateOf(maxLevel)
     var costFieldValue by mutableStateOf(cost)
-    var selectedEnchant by mutableStateOf("")
 }
 
 @Composable
@@ -16,42 +15,39 @@ fun rememberJsonGeneratorState(name: String, maxLevel: String, cost: String): Js
         JsonGeneratorState(name, maxLevel, cost)
     }
 
+fun clearInputFields(state: JsonGeneratorState) {
+    state.nameFieldValue = ""
+    state.maxLevelFieldValue = ""
+    state.costFieldValue = ""
+}
+
 fun addEnchantToList(state: JsonGeneratorState) {
     if (state.nameFieldValue.isAlphabetical() && state.maxLevelFieldValue.isNumerical() && state.costFieldValue.isNumerical()) {
-        state.jsonEnchantList.add(
-            Enchant(
-                state.nameFieldValue,
-                state.maxLevelFieldValue.toIntOrNull(),
-                state.costFieldValue.toIntOrNull()
+            state.jsonEnchantList.add(
+                Enchant(
+                    state.nameFieldValue,
+                    state.maxLevelFieldValue.toIntOrNull(),
+                    state.costFieldValue.toIntOrNull()
+                )
             )
-        )
-        state.selectedEnchant = state.nameFieldValue
-        state.nameFieldValue = ""
-        state.maxLevelFieldValue = ""
-        state.costFieldValue = ""
+        clearInputFields(state)
     }
 }
 
-fun deleteEnchant(state: JsonGeneratorState) {
-    if (state.selectedEnchant != "") {
-        val enchantToDelete: Enchant? = state.jsonEnchantList.find { it.enchantName == state.selectedEnchant }
-        state.jsonEnchantList.remove(enchantToDelete)
-        state.selectedEnchant = ""
-    }
+fun deleteEnchant(enchantName: String, state: JsonGeneratorState) {
+    val enchantToDelete: Enchant? = state.jsonEnchantList.find { it.enchantName == enchantName }
+    state.jsonEnchantList.remove(enchantToDelete)
 }
 
-fun editEnchant(state: JsonGeneratorState) {
-    if (state.selectedEnchant != "") {
-        val enchantToEdit: Enchant? = state.jsonEnchantList.find { it.enchantName == state.selectedEnchant }
-        state.nameFieldValue = enchantToEdit?.enchantName.toString().trimEnd()
-        state.maxLevelFieldValue = enchantToEdit?.enchantMaxLevel.toString()
-        state.costFieldValue = enchantToEdit?.enchantCost.toString()
-        state.jsonEnchantList.remove(enchantToEdit)
-        state.selectedEnchant = ""
-    }
+fun editEnchant(enchantName: String,state: JsonGeneratorState) {
+    val enchantToEdit: Enchant? = state.jsonEnchantList.find { it.enchantName == enchantName }
+    state.nameFieldValue = enchantToEdit?.enchantName.toString().trimEnd()
+    state.maxLevelFieldValue = enchantToEdit?.enchantMaxLevel.toString()
+    state.costFieldValue = enchantToEdit?.enchantCost.toString()
+    deleteEnchant(enchantName, state)
 }
 
-
-//these may not be necessary, as the textFields filter this stuff out on their own
+//These serve a duel purpose, both as redundancy for the input filter,
+//as well as only allowing an item to be added if the fields aren't empty.
 fun String?.isNumerical() = !this.isNullOrEmpty() && this.all {Character.isDigit(it)}
 fun String?.isAlphabetical() = !this.isNullOrEmpty() && this.all {Character.isLetter(it) || Character.isWhitespace(it)}
