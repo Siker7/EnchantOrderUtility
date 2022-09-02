@@ -7,6 +7,8 @@ class JsonGeneratorState(name: String, maxLevel: String, cost: String) {
     var nameFieldValue by mutableStateOf(name)
     var maxLevelFieldValue by mutableStateOf(maxLevel)
     var costFieldValue by mutableStateOf(cost)
+    var duplicateDialogOpen by mutableStateOf(false)
+    var replaceWithDuplicate by mutableStateOf(false)
 }
 
 @Composable
@@ -23,6 +25,22 @@ fun clearInputFields(state: JsonGeneratorState) {
 
 fun addEnchantToList(state: JsonGeneratorState) {
     if (state.nameFieldValue.isAlphabetical() && state.maxLevelFieldValue.isNumerical() && state.costFieldValue.isNumerical()) {
+        if (state.jsonEnchantList.any {it.enchantName.equals(state.nameFieldValue, true)}) {
+            if (state.replaceWithDuplicate) {
+                val replacedIndex = state.jsonEnchantList.indexOf(state.jsonEnchantList.find {it.enchantName.equals(state.nameFieldValue, true)})
+                state.jsonEnchantList[replacedIndex] = (
+                    Enchant(
+                        state.nameFieldValue,
+                        state.maxLevelFieldValue.toIntOrNull(),
+                        state.costFieldValue.toIntOrNull()
+                    )
+                )
+                state.replaceWithDuplicate = false
+                clearInputFields(state)
+            } else {
+                state.duplicateDialogOpen = true
+            }
+        } else {
             state.jsonEnchantList.add(
                 Enchant(
                     state.nameFieldValue,
@@ -30,7 +48,9 @@ fun addEnchantToList(state: JsonGeneratorState) {
                     state.costFieldValue.toIntOrNull()
                 )
             )
-        clearInputFields(state)
+            clearInputFields(state)
+        }
+
     }
 }
 
@@ -39,13 +59,33 @@ fun deleteEnchant(enchantName: String, state: JsonGeneratorState) {
     state.jsonEnchantList.remove(enchantToDelete)
 }
 
-fun editEnchant(enchantName: String,state: JsonGeneratorState) {
+fun editEnchant(enchantName: String, state: JsonGeneratorState) {
     val enchantToEdit: Enchant? = state.jsonEnchantList.find { it.enchantName == enchantName }
     state.nameFieldValue = enchantToEdit?.enchantName.toString().trimEnd()
     state.maxLevelFieldValue = enchantToEdit?.enchantMaxLevel.toString()
     state.costFieldValue = enchantToEdit?.enchantCost.toString()
     deleteEnchant(enchantName, state)
 }
+
+/*
+fun checkForDuplicateEnchants(state: JsonGeneratorState) {
+    val enchantIterator = state.jsonEnchantList.listIterator()
+    while (enchantIterator.hasNext()) {
+        val iteratorIndex = enchantIterator.nextIndex()
+        val iteratorName = enchantIterator.next().enchantName
+        println(iteratorIndex)
+        if (state.jsonEnchantList.any{it.enchantName == iteratorName && state.jsonEnchantList.indexOf(it) != iteratorIndex}){
+            enchantIterator.set(state.jsonEnchantList[iteratorIndex].copy(isDuplicate = true))
+            println("duplicate found")
+            println(enchantIterator.nextIndex())
+        } else {
+            enchantIterator.set(state.jsonEnchantList[iteratorIndex].copy(isDuplicate = false))
+            println("duplicate not found")
+            println(enchantIterator.nextIndex())
+        }
+    }
+}
+*/
 
 //These serve a duel purpose, both as redundancy for the input filter,
 //as well as only allowing an item to be added if the fields aren't empty.

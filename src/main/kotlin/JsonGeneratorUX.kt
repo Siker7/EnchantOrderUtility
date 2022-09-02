@@ -19,14 +19,19 @@ import androidx.compose.ui.input.key.*
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.rememberDialogState
 import java.awt.event.KeyEvent
 
 // The part of the UI containing the first page of the list creation feature.
 // Eventually, this will be used to generate JSON files with lists of Enchant objects for the main part of the program to use.
 @Composable
 fun jsonGeneratorUI(state: JsonGeneratorState = rememberJsonGeneratorState("", "", "")){
+    duplicateDialog(state)
     //Column containing the entirety of this UI
     Column(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
         //Navigation tabs for the Json Generator UI
@@ -172,19 +177,49 @@ fun enchantCard(state:JsonGeneratorState, name: String, maxLevel: Int?, cost: In
             Text(text = name,
                 fontSize = 20.sp,
                 textAlign = TextAlign.Start,
+                maxLines = 1,
+                overflow = TextOverflow.Clip,
+                softWrap = false,
                 modifier = Modifier.weight(1.toFloat()).padding(start = 5.dp))
             Spacer(modifier = Modifier.width(1.dp).fillMaxHeight().background(Color.LightGray))
             Text(text = maxLevel.toString(),
                 fontSize = 20.sp,
                 textAlign = TextAlign.Center,
+                maxLines = 1,
                 modifier = Modifier.weight(0.3.toFloat()))
             Spacer(modifier = Modifier.width(1.dp).fillMaxHeight().background(Color.LightGray))
             Text(text = cost.toString(),
                 fontSize = 20.sp,
                 textAlign = TextAlign.Center,
+                maxLines = 1,
                 modifier = Modifier.weight(0.3.toFloat()))
             Button(onClick = {deleteEnchant(name, state)}, modifier = Modifier.fillMaxHeight().aspectRatio(1.toFloat()), contentPadding = PaddingValues(0.dp)){
                 Text("X", fontSize = 20.sp)
+            }
+        }
+    }
+}
+
+// Dialog box that shows when someone attempts to add a duplicate enchantment.
+// It gives the option to either cancel, or overwrite the existing item.
+@Composable
+fun duplicateDialog(state: JsonGeneratorState) {
+    if(state.duplicateDialogOpen) {
+        Dialog(onCloseRequest = {state.duplicateDialogOpen = false}, state = rememberDialogState(width = Dp.Unspecified, height = Dp.Unspecified), title = "Duplicate Enchantment"){
+            val buttonFocusRequester = FocusRequester()
+            Column(Modifier.padding(11.dp).width(250.dp)){
+                Text("That enchantment is already on the list. Would you like to replace it?", maxLines = 2, modifier = Modifier.fillMaxWidth(), textAlign = TextAlign.Center)
+                Row(Modifier.padding(top = 15.dp).fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly){
+                    Button(onClick = {state.duplicateDialogOpen = false}){
+                        Text("Cancel")
+                    }
+                    Button(onClick = {state.replaceWithDuplicate = true; addEnchantToList(state); state.duplicateDialogOpen = false}, modifier = Modifier.focusRequester(buttonFocusRequester)){
+                        Text("Replace")
+                    }
+                }
+            }
+            LaunchedEffect(Unit) {
+                buttonFocusRequester.requestFocus()
             }
         }
     }
