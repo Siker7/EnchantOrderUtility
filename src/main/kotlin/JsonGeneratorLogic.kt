@@ -4,20 +4,25 @@ import androidx.compose.runtime.*
 
 class JsonGeneratorState(name: String, maxLevel: String, cost: String) {
     var jsonEnchantList by mutableStateOf(mutableStateListOf<Enchant>())
+    var jsonToolList by mutableStateOf(mutableStateListOf<Tool>())
     var nameFieldValue by mutableStateOf(name)
     var maxLevelFieldValue by mutableStateOf(maxLevel)
     var costFieldValue by mutableStateOf(cost)
+    var toolFieldValue by mutableStateOf("")
     var duplicateDialogOpen by mutableStateOf(false)
     var replaceWithDuplicate by mutableStateOf(false)
+    var wizardScreen by mutableStateOf(1)
 }
 
+
+//may not need this for these values, need to revisit later
 @Composable
 fun rememberJsonGeneratorState(name: String, maxLevel: String, cost: String): JsonGeneratorState =
     remember(name, maxLevel, cost) {
         JsonGeneratorState(name, maxLevel, cost)
     }
 
-fun clearInputFields(state: JsonGeneratorState) {
+fun clearEnchantInputFields(state: JsonGeneratorState) {
     state.nameFieldValue = ""
     state.maxLevelFieldValue = ""
     state.costFieldValue = ""
@@ -32,11 +37,12 @@ fun addEnchantToList(state: JsonGeneratorState) {
                     Enchant(
                         state.nameFieldValue,
                         state.maxLevelFieldValue.toIntOrNull(),
-                        state.costFieldValue.toIntOrNull()
+                        state.costFieldValue.toIntOrNull(),
+                        emptyList()
                     )
                 )
                 state.replaceWithDuplicate = false
-                clearInputFields(state)
+                clearEnchantInputFields(state)
             } else {
                 state.duplicateDialogOpen = true
             }
@@ -45,10 +51,11 @@ fun addEnchantToList(state: JsonGeneratorState) {
                 Enchant(
                     state.nameFieldValue,
                     state.maxLevelFieldValue.toIntOrNull(),
-                    state.costFieldValue.toIntOrNull()
+                    state.costFieldValue.toIntOrNull(),
+                    emptyList()
                 )
             )
-            clearInputFields(state)
+            clearEnchantInputFields(state)
         }
 
     }
@@ -65,6 +72,44 @@ fun editEnchant(enchantName: String, state: JsonGeneratorState) {
     state.maxLevelFieldValue = enchantToEdit?.enchantMaxLevel.toString()
     state.costFieldValue = enchantToEdit?.enchantCost.toString()
     deleteEnchant(enchantName, state)
+}
+
+fun addToolToList(state: JsonGeneratorState) {
+    if (state.toolFieldValue.isAlphabetical()){
+        if (state.jsonToolList.any{it.toolName.equals(state.toolFieldValue, true)}){
+            if (state.replaceWithDuplicate) {
+                val replacedToolIndex = state.jsonToolList.indexOf(state.jsonToolList.find {it.toolName.equals(state.toolFieldValue, true)})
+                state.jsonToolList[replacedToolIndex] = (
+                    Tool(
+                        state.toolFieldValue,
+                        emptyList()
+                    )
+                )
+                state.toolFieldValue = ""
+            } else {
+                state.duplicateDialogOpen = true
+            }
+        } else {
+            state.jsonToolList.add(
+                Tool(
+                    state.toolFieldValue,
+                    emptyList()
+                )
+            )
+            state.toolFieldValue = ""
+        }
+    }
+}
+
+fun deleteTool(toolName:String, state: JsonGeneratorState) {
+    val toolToDelete: Tool? = state.jsonToolList.find {it.toolName == toolName}
+    state.jsonToolList.remove(toolToDelete)
+}
+
+fun editTool(toolName: String, state: JsonGeneratorState) {
+    val toolToEdit: Tool? = state.jsonToolList.find { it.toolName == toolName }
+    state.toolFieldValue = toolToEdit?.toolName.toString().trimEnd()
+    deleteTool(toolName, state)
 }
 
 /*
